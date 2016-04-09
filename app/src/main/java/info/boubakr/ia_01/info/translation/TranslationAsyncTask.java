@@ -8,14 +8,7 @@ import info.boubakr.ia_01.MainActivity;
 import info.boubakr.ia_01.R;
 
 /**
- * Created by aboubakr on 06/04/16.
- */
-/*
-    cette classe va lancer le thread de la translation on faisant appel ala methode
-    translate de la classe Translator ....
-    il est obligatoiiire de faiire  cette tache dans un thread séparé puisque à partir
-    d'API 11 on ne peut pas faire une connexion Internet dans le thread principal
-    ;))
+ * Created by boubakr on 06/04/16.
  */
 public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
 
@@ -24,39 +17,35 @@ public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
     private String textSource;
     private String translatedText="";
 
-    //les deux languages pour le moment on suppose que le languege est  le Fr et on on translate a Eng
-    private String sourceLanguageCode = "fr";
-    private String targetLanguageCode = "en";
+    //les deux languages pour le moment on suppose que le languege est  le Fr et on on translate a Eng :o!
+    private String sourceLanguageCode = "eng";
+    private String targetLanguageCode = "fr";
     //
-
-    //la methode do in
+    //appeler le translator Microsoft .. j'ai utilisé Microsoft translate au lieu de Google translate car je le déjas tester
     @Override
     protected Boolean doInBackground(String... params) {
         translatedText = Translator.translate(sourceLanguageCode,targetLanguageCode,textSource);
-
-        if(translatedText.equals(Translator.BAD_TRANSLATION_MSG))
-           return false;
-
-
+        if(translatedText.equals(Translator.BAD_TRANSLATION_MSG)) return false;
         return true;
     }
     /*
-    constructor :)
+    constructor :3
      */
-    public  TranslationAsyncTask(MainActivity mainActivity, String textSource){
+    public  TranslationAsyncTask(MainActivity mainActivity, String textSource,String sourceLanguageCode,String targetLanguageCode){
         this.mainActivity = mainActivity;
         this.translationText = (TextView) mainActivity.findViewById(R.id.translated_text);
         this.textSource = textSource ;
+
+        /*
+        activer aprés la réalisation de menu :
+        this.sourceLanguageCode = sourceLanguageCode;
+        this.targetLanguageCode = targetLanguageCode;
+        */
     }
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-
         translationText.setText(translatedText);
-        /*
-        le text de la translation sera apré invisible par défaut et il ne sera visible que si
-        la translation est faite  avec succés ... à faire.
-         */
     }
 }

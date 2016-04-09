@@ -27,8 +27,12 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="100dp">
+        android:layout_height="100dp"
+        android:layout_marginTop="100dp"
+        android:gravity="center">
+
         <TextView
+            android:textColor="@color/colorAccent"
             android:id="@+id/detection_result"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -38,7 +42,8 @@
             android:id="@+id/translated_text"
             android:layout_width="wrap_content"
             android:hint="translated text"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:textColor="@color/colorAccent"/>
 
         <ProgressBar
             android:id="@+id/telechargement"

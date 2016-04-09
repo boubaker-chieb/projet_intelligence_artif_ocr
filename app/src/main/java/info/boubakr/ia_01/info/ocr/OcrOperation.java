@@ -19,7 +19,7 @@ public class OcrOperation {
     private String recognizedText; //Le text rconnue
     private String path; //Stockage du device
     private String languageCode; // code ISO du language !
-    private  TessBaseAPI baseAPI;
+    private  TessBaseAPI baseAPI; //La clase qui fait la reconnaissance.
 
     // constructeur ;)
     public OcrOperation(Bitmap bitmap , String path, String languageCode, TessBaseAPI baseAPI){
@@ -29,17 +29,12 @@ public class OcrOperation {
         this.baseAPI = baseAPI;
     }
 
-
     public void runOCR() throws IOException{
-
-
-        baseAPI.setDebug(true);
+      baseAPI.setDebug(true);
         baseAPI.init(path, languageCode);
         baseAPI.setImage(bitmap);
         recognizedText = baseAPI.getUTF8Text();
         baseAPI.end();
-
-
     }
 
     public String getRecognizedText() {

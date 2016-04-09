@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import info.boubakr.ia_01.info.ocr.InitOCRAsyncTask;
 import info.boubakr.ia_01.info.ocr.OcrOperation;
+import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String OSD_FILENAME = "tesseract-ocr-3.01.osd.tar";
     private static final String  DIRNAME = "/tessdata";
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-
+    private String recongnizedText;
     private String DATA_PATH = Environment.getExternalStorageDirectory().getPath();
 
     private TessBaseAPI baseApi;
@@ -131,20 +132,22 @@ public class MainActivity extends AppCompatActivity {
         return DIR;
     }
 
+    //// Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
     public void resumeOcr() {
-
-
-
-        // Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
-
         try {
             OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,"eng",baseApi);
             ocrOperation.runOCR();
-            this.resultOCR.setText(ocrOperation.getRecognizedText());
+            recongnizedText = ocrOperation.getRecognizedText();
+            this.resultOCR.setText(recongnizedText);
+            runTranslation();
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG, "L'ocr ma mchech :(");
             Toast.makeText(MainActivity.this, "Faild to do the recongnition !", Toast.LENGTH_SHORT).show();
         }
+    }
+    //lancer la translation
+    private void runTranslation() {
+        new TranslationAsyncTask(this,recongnizedText, lang, "fr").execute();
     }
 }
