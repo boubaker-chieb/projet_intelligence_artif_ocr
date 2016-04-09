@@ -13,20 +13,26 @@ import java.io.IOException;
  * Created by aboubakr on 06/04/16.
  */
 public class OcrOperation {
-   // ExternelStorage es = new ExternelStorage();
-    //String path;
-    Bitmap bitmap;
-    String recognizedText;
-    public OcrOperation(Bitmap bitmap){
-        this.bitmap = bitmap ;
-        //this.path = path;
 
+    private Bitmap bitmap; //image surlaquelle on va faire le reconnassance de text
+    private String recognizedText; //Le text rconnue
+    private String path; //Stockage du device
+    private String languageCode; // code ISO du language !
+    private  TessBaseAPI baseAPI;
+    // constructeur ;)
+    public OcrOperation(Bitmap bitmap , String path, String languageCode, TessBaseAPI baseAPI){
+        this.bitmap = bitmap ;
+        this.path = path;
+        this.languageCode = languageCode;
+        this.baseAPI = baseAPI;
     }
+
+
     public void runOCR() throws IOException{
 
-        TessBaseAPI baseAPI = new TessBaseAPI();
+
         baseAPI.setDebug(true);
-        baseAPI.init("/mnt/sdcard/tesseract/tessdata/eng.traineddata", "eng");
+        baseAPI.init(path, "eng");
         baseAPI.setImage(bitmap);
         recognizedText = baseAPI.getUTF8Text();
         baseAPI.end();

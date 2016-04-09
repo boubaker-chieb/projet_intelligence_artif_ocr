@@ -12,13 +12,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
+import java.io.IOException;
 
 import info.boubakr.ia_01.info.ocr.InitOCRAsyncTask;
+import info.boubakr.ia_01.info.ocr.OcrOperation;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Button capture;
     private ImageView image;
-    Bitmap bitmap;
-
+    private  Bitmap bitmap;
+    private TextView resultOCR;
     public static Context appContext;
     private String lang;
 
@@ -56,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_capture);
         lang = "eng";
         appContext = getApplicationContext();
-
+        baseApi = new TessBaseAPI();
         capture = (Button) findViewById(R.id.button_capture);
         image = (ImageView) findViewById(R.id.result);
-
+        this.resultOCR = (TextView)findViewById(R.id.detection_result);
 
         capture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,13 +131,24 @@ public class MainActivity extends AppCompatActivity {
         return DIR;
     }
 
-    public String resumeOcr() {
+    public void resumeOcr() {
         baseApi.setDebug(true);
         baseApi.init(DATA_PATH, lang);
         baseApi.setImage(bitmap);
         String recongnizedText = baseApi.getUTF8Text();
         baseApi.end();
-        Log.v(TAG,"OCRed Text : " + recongnizedText);
-        return recongnizedText;
+        Log.v(TAG, "OCRed Text : " + recongnizedText);
+
+        // Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
+
+        try {
+            OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,"eng",baseApi);
+            ocrOperation.runOCR();
+            this.resultOCR.setText(ocrOperation.getRecognizedText());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "L'ocr ma mchech :(");
+            Toast.makeText(MainActivity.this, "Faild to do the recongnition !", Toast.LENGTH_SHORT).show();
+        }
     }
 }

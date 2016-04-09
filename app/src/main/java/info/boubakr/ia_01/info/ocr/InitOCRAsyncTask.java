@@ -83,8 +83,7 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
         progressBar.setVisibility(View.INVISIBLE);
         dialog.dismiss();
         if(result){
-          resultOCR.setText(mainActivity.resumeOcr());
-
+          mainActivity.resumeOcr();
         }
         else
         {
