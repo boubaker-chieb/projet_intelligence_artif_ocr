@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.widget.TextView;
 
 
-import info.boubakr.ia_01.Capture;
+import info.boubakr.ia_01.MainActivity;
 import info.boubakr.ia_01.R;
 
 /**
@@ -19,14 +19,14 @@ import info.boubakr.ia_01.R;
  */
 public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
 
-    private Capture capture;
+    private MainActivity mainActivity;
     private TextView translationText;
     private String textSource;
     private String translatedText="";
 
     //les deux languages pour le moment on suppose que le languege est  le Fr et on on translate a Eng
     private String sourceLanguageCode = "fr";
-    private String targetLanguageCode = "eng";
+    private String targetLanguageCode = "en";
     //
 
     //la methode do in
@@ -43,9 +43,9 @@ public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
     /*
     constructor :)
      */
-    public  TranslationAsyncTask(Capture capture, String textSource){
-        this.capture = capture;
-        this.translationText = (TextView) capture.findViewById(R.id.translated_text);
+    public  TranslationAsyncTask(MainActivity mainActivity, String textSource){
+        this.mainActivity = mainActivity;
+        this.translationText = (TextView) mainActivity.findViewById(R.id.translated_text);
         this.textSource = textSource ;
     }
 
