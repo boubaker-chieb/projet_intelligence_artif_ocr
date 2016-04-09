@@ -132,12 +132,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resumeOcr() {
-        baseApi.setDebug(true);
-        baseApi.init(DATA_PATH, lang);
-        baseApi.setImage(bitmap);
-        String recongnizedText = baseApi.getUTF8Text();
-        baseApi.end();
-        Log.v(TAG, "OCRed Text : " + recongnizedText);
+
+
 
         // Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
 

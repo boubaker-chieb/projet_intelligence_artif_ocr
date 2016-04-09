@@ -3,6 +3,7 @@ package info.boubakr.ia_01.info.ocr;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.util.Log;
 
 
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -19,6 +20,7 @@ public class OcrOperation {
     private String path; //Stockage du device
     private String languageCode; // code ISO du language !
     private  TessBaseAPI baseAPI;
+
     // constructeur ;)
     public OcrOperation(Bitmap bitmap , String path, String languageCode, TessBaseAPI baseAPI){
         this.bitmap = bitmap ;
@@ -32,7 +34,7 @@ public class OcrOperation {
 
 
         baseAPI.setDebug(true);
-        baseAPI.init(path, "eng");
+        baseAPI.init(path, languageCode);
         baseAPI.setImage(bitmap);
         recognizedText = baseAPI.getUTF8Text();
         baseAPI.end();
