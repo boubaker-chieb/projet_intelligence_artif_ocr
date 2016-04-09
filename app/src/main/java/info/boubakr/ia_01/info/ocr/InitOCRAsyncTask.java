@@ -83,7 +83,7 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
         progressBar.setVisibility(View.INVISIBLE);
         dialog.dismiss();
         if(result){
-          mainActivity.resumeOcr();
+          mainActivity.startOcr();
         }
         else
         {
@@ -95,7 +95,7 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
     protected Boolean doInBackground(String... params) {
         boolean isCubeSupported = false;
         String destinationFilenameBase = "tesseract-ocr-3.02." + languageCode + ".tar";
-        //vérifier l'existance de repertoire tessdata et e créer si nécessaire
+        //vérifier l'existance de repertoire tessdata et le créer si nécessaire
         File tessdataDir = new File(DATA_PATH + File.separator + "tessdata");
         if(!tessdataDir.exists() && !tessdataDir.mkdirs()){
             Log.e(TAG,"Couldnt make directory"+tessdataDir);
@@ -231,8 +231,8 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
             }
             //tuer le progress dialog box .. 3:)
             try {
-                           dialog.dismiss();
-            }   catch (IllegalArgumentException e)   {
+                dialog.dismiss();
+            }   catch (IllegalArgumentException e){
 
             }
             if (baseAPI.init(DATA_PATH+File.separator,languageCode,ocrEngineMode)){
@@ -494,7 +494,7 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
         dialog.setTitle("Please wait");
         dialog.setMessage("Checking for data installation...");
         dialog.setIndeterminate(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
         dialog.show();
         super.onPreExecute();

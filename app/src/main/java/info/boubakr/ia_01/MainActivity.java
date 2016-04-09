@@ -3,9 +3,11 @@ package info.boubakr.ia_01;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,31 +30,39 @@ import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressDialog dialog; // for initOcr - language download & unzip
-    private ProgressDialog indeterminateDialog;
+    //ints
+    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
+    //Strings[]
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
 
+
+
+
+    private boolean isEngineReady;
+    //Strings
     private final static  String TAG = MainActivity.class.getSimpleName();
     public static final String OSD_FILENAME_BASE = "osd.traineddata";
     public static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
     public static final String OSD_FILENAME = "tesseract-ocr-3.01.osd.tar";
     private static final String  DIRNAME = "/tessdata";
-    private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
     private String recongnizedText;
     private String DATA_PATH = Environment.getExternalStorageDirectory().getPath();
+    private String lang;
 
-    private TessBaseAPI baseApi;
-
-    private boolean isEngineReady;
-
+    //widjets
     private ImageButton capture;
     private ImageView image;
     private  Bitmap bitmap;
     private TextView resultOCR;
     public static Context appContext;
-    private String lang;
+    private ProgressDialog dialog; // for initOcr - language download & unzip
+    private ProgressDialog indeterminateDialog;
+
+    //les autres objets
+
+    private TessBaseAPI baseApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +100,14 @@ public class MainActivity extends AppCompatActivity {
                 bitmap = (Bitmap) data.getExtras().get("data");
                 image.setImageBitmap(bitmap);
 
-               // startOcr(bitmap, lang);
+                // TODO
+                /*
+                La dernière langage utilisé par l'aplication sera enregistré dans un shared preferences
+                si le language courant est le que le language de la dernière utilisation de l'appppppp
+                on passse directement à la reconnaissance si nn on initialise l'ocr ...
+                 */
                 baseApi = new TessBaseAPI();
-                new InitOCRAsyncTask(this, lang,baseApi, ocrEngineMode).execute();
+                initOcrIngine(Environment.getExternalStorageDirectory(),lang,"eng");
                 break;
         }
 
@@ -134,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //// Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
-    public void resumeOcr() {
+    public void startOcr() {
         try {
             OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,"eng",baseApi);
             ocrOperation.runOCR();
@@ -150,5 +165,68 @@ public class MainActivity extends AppCompatActivity {
     //lancer la translation
     private void runTranslation() {
         new TranslationAsyncTask(this,recongnizedText, lang, "fr").execute();
+    }
+
+    //initialiser ocr
+
+    private void  initOcrIngine(File storageRoot, String languageCode, String languageName) {
+            isEngineReady = false;
+        if(dialog != null){
+            dialog.dismiss();
+        }
+        dialog = new ProgressDialog(this);
+        // si on a un lannguege qui marche on utulisant cube seulement on change le mmode à cube
+        if (ocrEngineMode != TessBaseAPI.OEM_CUBE_ONLY) {
+            for (String s : CUBE_REQUIRED_LANGUAGES) {
+                if (s.equals(languageCode)) {
+                    ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    //prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
+                }
+            }
+        }
+        if (ocrEngineMode != TessBaseAPI.OEM_TESSERACT_ONLY) {
+            boolean cubeOk = false;
+            for (String s : CUBE_SUPPORTED_LANGUAGES) {
+                if (s.equals(languageCode)) {
+                    cubeOk = true;
+                }
+            }
+            if (!cubeOk) {
+                ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                //prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
+            }
+        }
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Please wait");
+        String ocrEngineModeName = getOcrEngineModeName();
+
+        if (ocrEngineModeName.equals("Both")) {
+            dialog.setMessage("Initializing Cube and Tesseract OCR engines for " + languageName + "...");
+        } else {
+            dialog.setMessage("Initializing " + ocrEngineModeName + " OCR engine for " + languageName + "...");
+        }
+        dialog.setCancelable(false);
+       // dialog.show();
+
+        if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY || ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
+            Log.d(TAG, "Disabling continuous preview");
+        }
+        baseApi = new TessBaseAPI();
+        new InitOCRAsyncTask(this, languageCode, baseApi, ocrEngineMode)
+                .execute(storageRoot.toString());
+    }
+    String getOcrEngineModeName() {
+        String ocrEngineModeName = "";
+        String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
+        if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_ONLY) {
+            ocrEngineModeName = ocrEngineModes[0];
+        } else if (ocrEngineMode == TessBaseAPI.OEM_CUBE_ONLY) {
+            ocrEngineModeName = ocrEngineModes[1];
+        } else if (ocrEngineMode == TessBaseAPI.OEM_TESSERACT_CUBE_COMBINED) {
+            ocrEngineModeName = ocrEngineModes[2];
+        }
+        return ocrEngineModeName;
     }
 }
