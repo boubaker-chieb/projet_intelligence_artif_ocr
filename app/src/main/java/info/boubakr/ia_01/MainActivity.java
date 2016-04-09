@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isEngineReady;
 
-    private Button capture;
+    private ImageButton capture;
     private ImageView image;
     private  Bitmap bitmap;
     private TextView resultOCR;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         lang = "eng";
         appContext = getApplicationContext();
         baseApi = new TessBaseAPI();
-        capture = (Button) findViewById(R.id.button_capture);
+        capture = (ImageButton) findViewById(R.id.button_capture);
         image = (ImageView) findViewById(R.id.result);
         this.resultOCR = (TextView)findViewById(R.id.detection_result);
 
