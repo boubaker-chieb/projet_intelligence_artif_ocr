@@ -10,9 +10,7 @@
     <!-- / Permessions -->
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature
-        android:name="android.hardware.camera.flash"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.screen.landscape" />
 
@@ -29,10 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".PreferencesActivity"
-            android:label="@string/title_activity_preferences"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>

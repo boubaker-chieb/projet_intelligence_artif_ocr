@@ -9,12 +9,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
 
+    //booleans
+    boolean hidden = true;
 
 
 
@@ -58,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultOCR;
     public static Context appContext;
     private ProgressDialog dialog; // for initOcr - language download & unzip
-    private ProgressDialog indeterminateDialog;
-
+    private ImageButton settings,help;
+    private Toolbar toolbar;
+    private LinearLayout menu;
+    private View.OnClickListener cl;
     //les autres objets
 
     private TessBaseAPI baseApi;
@@ -69,11 +77,16 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture);
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
         lang = "eng";
         appContext = getApplicationContext();
         baseApi = new TessBaseAPI();
         capture = (ImageButton) findViewById(R.id.button_capture);
         image = (ImageView) findViewById(R.id.result);
+
+        menu = (LinearLayout) findViewById(R.id.reveal_items);
+        settings = (ImageButton) findViewById(R.id.settings);
+        help = (ImageButton) findViewById(R.id.Help);
         this.resultOCR = (TextView)findViewById(R.id.detection_result);
 
         capture.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +97,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 0);
             }
         });
+        cl = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.settings:
+                        Snackbar.make(v, "General settings..", Snackbar.LENGTH_SHORT).show();
+                        menu.setVisibility(View.INVISIBLE);
+                        MainActivity.this.hidden = true;
+                        break;
+                    case R.id.Help:
+                        Snackbar.make(v, "Language settings..", Snackbar.LENGTH_SHORT).show();
+                        menu.setVisibility(View.INVISIBLE);
+                        MainActivity.this.hidden = true;
+                        break;
+                }
+            }
+        };
+        settings.setOnClickListener(cl);
+        help.setOnClickListener(cl);
+        setSupportActionBar(toolbar);
+        menu.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -228,5 +262,28 @@ public class MainActivity extends AppCompatActivity {
             ocrEngineModeName = ocrEngineModes[2];
         }
         return ocrEngineModeName;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.action_menu){
+            if(hidden){
+                menu.setVisibility(View.VISIBLE);
+                hidden = false;
+            }
+            else {
+                menu.setVisibility(View.INVISIBLE);
+                hidden = true;
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
