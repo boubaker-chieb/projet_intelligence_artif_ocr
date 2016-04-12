@@ -1,11 +1,6 @@
 package info.boubakr.ia_01.info.ocr;
 
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
-import android.util.Log;
-
-
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.IOException;
