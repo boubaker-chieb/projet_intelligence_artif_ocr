@@ -48,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isEngineReady;
     //Strings
+
+
+    public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";/**  code ISO 639-1  de la language source*/
+    public static final String DEFAULT_TARGET_LANGUAGE_CODE = "fr";    /**  code ISO 639-1  de la language destinition*/
+
     private final static  String TAG = MainActivity.class.getSimpleName();
     public static final String OSD_FILENAME_BASE = "osd.traineddata";
     public static final String DOWNLOAD_BASE = "http://tesseract-ocr.googlecode.com/files/";
@@ -105,6 +110,13 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.make(v, "General settings..", Snackbar.LENGTH_SHORT).show();
                         menu.setVisibility(View.INVISIBLE);
                         MainActivity.this.hidden = true;
+                        // TODO
+                        /*
+                        en cliquant sur ce boutton on lance une Activity contenant les paramtres
+
+                         */
+                        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.Help:
                         Snackbar.make(v, "Language settings..", Snackbar.LENGTH_SHORT).show();
@@ -136,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // TODO
                 /*
-                La dernière langage utilisé par l'aplication sera enregistré dans un shared preferences
+                La dernière langage utilisé par l'aplication sera enregistré dans un shared settings
                 si le language courant est le que le language de la dernière utilisation de l'appppppp
                 on passse directement à la reconnaissance si nn on initialise l'ocr ...
                  */

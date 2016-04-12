@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Translation settings -->
+    <PreferenceCategory
+        android:title="Translation settings">
+
+        <CheckBoxPreference
+            android:key="preference_translate"
+             android:title="Translate"/>
+
+        <ListPreference android:key="translate_to"
+                 android:title="Translate to"
+                android:dependency="preference_translate"
+                android:entries="@array/translationtargetlanguagenames_microsoft"
+                android:entryValues="@array/translationtargetlanguagenames_microsoft"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="recongnition settings">
+
+        <CheckBoxPreference
+            android:key="preference_recongnize"
+            android:title="Recongnize"/>
+
+        <ListPreference android:key="language_to_recongnize"
+            android:title="Languege"
+            android:dependency="preference_recongnize"
+            android:entries="@array/translationtargetlanguagenames_microsoft"
+            android:entryValues="@array/iso6393"/>
+    </PreferenceCategory>
+</PreferenceScreen>
