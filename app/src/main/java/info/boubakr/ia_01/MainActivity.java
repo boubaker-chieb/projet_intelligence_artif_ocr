@@ -29,11 +29,13 @@ import java.io.IOException;
 
 import info.boubakr.ia_01.info.ocr.InitOCRAsyncTask;
 import info.boubakr.ia_01.info.ocr.OcrOperation;
+import info.boubakr.ia_01.info.translation.LanguageCodeHelper;
 import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private SharedPreferences prefs;
     //ints
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
 
@@ -42,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
 
     //booleans
-    boolean hidden = true;
-
+    private boolean hidden = true;
+    private boolean isFirstLunch;
 
 
     private boolean isEngineReady;
@@ -61,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private String recongnizedText;
     private String DATA_PATH = Environment.getExternalStorageDirectory().getPath();
     private String lang;
-
+    private String sourceLanguageCode;
+    private String sourceLanguageName;
     //widjets
     private ImageButton capture;
     private ImageView image;
@@ -76,11 +79,20 @@ public class MainActivity extends AppCompatActivity {
     //les autres objets
 
     private TessBaseAPI baseApi;
+    private String sourceLanguageCodeTranslation;
+    private String targetLanguageCodeTranslation;
+    private String targetLanguageName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        
+        if(isFirstLunch){
+            setDefaultPreferences();
+        }
+        
         setContentView(R.layout.activity_capture);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         lang = "eng";
@@ -216,7 +228,8 @@ public class MainActivity extends AppCompatActivity {
     //initialiser ocr
 
     private void  initOcrIngine(File storageRoot, String languageCode, String languageName) {
-            isEngineReady = false;
+        deleteDirContent("tessdata"); // une solution temporaire pour évité lé exception
+        isEngineReady = false;
         if(dialog != null){
             dialog.dismiss();
         }
@@ -297,5 +310,34 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void setDefaultPreferences(){
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putString(SettingsActivity.KEY_SOURCE_LANGUAGE_PREFERENCE,this.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
+        prefs.edit().putString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,this.DEFAULT_TARGET_LANGUAGE_CODE);
+    }
+
+    public boolean setSourceLanguageCode(String sourceLanguageCode) {
+        this.sourceLanguageCode = sourceLanguageCode;
+        sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(sourceLanguageCode);
+        
+        sourceLanguageName = LanguageCodeHelper.getTranslationLanguageName(this,sourceLanguageCode);
+        
+        return  true;
+    }
+    private boolean setTargetLanguage(String languageCode) {
+        targetLanguageCodeTranslation = languageCode;
+        targetLanguageName = LanguageCodeHelper.getTranslationLanguageName(this, languageCode);
+        return true;
+    }
+    // méthode utilisé pour vider le dossier tessdata aprés chaque essai de reconginition
+    private void deleteDirContent(String dirName){
+        File dir = new File(DATA_PATH + File.separator + dirName);
+        if(dir.isDirectory()){
+            String[] children = dir.list();
+            for( int i = 0 ; i < children.length ; i++){
+                new File(dir, children[i]).delete();
+            }
+        }
     }
 }

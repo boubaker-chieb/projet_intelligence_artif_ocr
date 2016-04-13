@@ -22,10 +22,7 @@ import android.util.Log;
 import info.boubakr.ia_01.R;
 
 
-/**
- * Class for handling functions relating to converting between standard language
- * codes, and converting language codes to language names.
- */
+
 public class LanguageCodeHelper {
 	public static final String TAG = "LanguageCodeHelper";
 	private LanguageCodeHelper() {
@@ -117,7 +114,7 @@ public class LanguageCodeHelper {
       return "ro";
     } else if (languageCode.equals("rus")) { // Russian
       return "ru";
-    } else if (languageCode.equals("srp")) { // Serbian (Latin) // TODO is google expecting Cyrillic?
+    } else if (languageCode.equals("srp")) { // Serbian
       return "sr";
     } else if (languageCode.equals("slk")) { // Slovak
       return "sk";

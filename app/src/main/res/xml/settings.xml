@@ -6,10 +6,12 @@
 
         <CheckBoxPreference
             android:key="preference_translate"
-             android:title="Translate"/>
+             android:title="Translate"
+            android:defaultValue="true"/>
 
         <ListPreference android:key="translate_to"
                  android:title="Translate to"
+                android:summary="Choose destination language"
                 android:dependency="preference_translate"
                 android:entries="@array/translationtargetlanguagenames_microsoft"
                 android:entryValues="@array/translationtargetlanguagenames_microsoft"/>
@@ -20,11 +22,13 @@
 
         <CheckBoxPreference
             android:key="preference_recongnize"
-            android:title="Recongnize"/>
+            android:title="Recongnize"
+            android:defaultValue="true"/>
 
         <ListPreference android:key="language_to_recongnize"
             android:title="Languege"
             android:dependency="preference_recongnize"
+            android:summary="Choose source language"
             android:entries="@array/translationtargetlanguagenames_microsoft"
             android:entryValues="@array/iso6393"/>
     </PreferenceCategory>
