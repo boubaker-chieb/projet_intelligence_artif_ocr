@@ -7,7 +7,8 @@ public class LanguageCodeHelper {
 	}
     //cette méthode a comme entré le code du langage en ISO 6393  et retourne son equivalent acceptable par le translator
 	public static String mapLanguageCode(String languageCode) {
-	  if (languageCode.equals("afr")) { // Afrikaans
+
+	    if (languageCode.equals("afr")) { // Afrikaans
 	    return "af";
 	  } else if (languageCode.equals("sqi")) { // Albanian
 	    return "sq";

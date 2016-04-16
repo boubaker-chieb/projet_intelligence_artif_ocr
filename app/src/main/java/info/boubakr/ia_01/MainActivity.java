@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,7 +34,7 @@ import info.boubakr.ia_01.info.translation.LanguageCodeHelper;
 import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private SharedPreferences prefs;
     //ints
