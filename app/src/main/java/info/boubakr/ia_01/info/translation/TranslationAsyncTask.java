@@ -18,8 +18,8 @@ public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
     private String translatedText="";
 
     //les deux languages pour le moment on suppose que le languege est  le Fr et on on translate a Eng :o!
-    private String sourceLanguageCode = "eng";
-    private String targetLanguageCode = "fr";
+    private String sourceLanguageCode ;
+    private String targetLanguageCode ;
     //
     //appeler le translator Microsoft .. j'ai utilisé Microsoft translate au lieu de Google translate car je le déjas tester
     @Override
@@ -31,18 +31,13 @@ public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
     /*
     constructor :3
      */
-    public  TranslationAsyncTask(MainActivity mainActivity, String textSource,String sourceLanguageCode,String targetLanguageCode){
+    public TranslationAsyncTask(MainActivity mainActivity, String textSource,String sourceLanguageCode,String targetLanguageCode){
         this.mainActivity = mainActivity;
         this.translationText = (TextView) mainActivity.findViewById(R.id.translated_text);
         this.textSource = textSource ;
-
-        /*
-        activer aprés la réalisation de menu :
         this.sourceLanguageCode = sourceLanguageCode;
         this.targetLanguageCode = targetLanguageCode;
-        */
     }
-
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);

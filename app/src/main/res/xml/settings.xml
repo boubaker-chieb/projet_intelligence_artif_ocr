@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<!-- Translation settings -->
-    <PreferenceCategory
-        android:title="Translation settings">
-
-        <CheckBoxPreference
-            android:key="preference_translate"
-             android:title="Translate"
-            android:defaultValue="true"/>
-
-        <ListPreference android:key="translate_to"
-                 android:title="Translate to"
-                android:summary="Choose destination language"
-                android:dependency="preference_translate"
-                android:entries="@array/translationtargetlanguagenames_microsoft"
-                android:entryValues="@array/translationtargetlanguagenames_microsoft"/>
-    </PreferenceCategory>
 
     <PreferenceCategory
         android:title="recongnition settings">
@@ -25,11 +9,28 @@
             android:title="Recongnize"
             android:defaultValue="true"/>
 
-        <ListPreference android:key="language_to_recongnize"
-            android:title="Languege"
+        <ListPreference android:key="language_to_recognize"
+            android:title="Language"
             android:dependency="preference_recongnize"
             android:summary="Choose source language"
-            android:entries="@array/translationtargetlanguagenames_microsoft"
+            android:entries="@array/languagenames"
             android:entryValues="@array/iso6393"/>
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Translation settings">
+
+        <CheckBoxPreference
+            android:key="preference_translate"
+            android:title="Translate"
+            android:defaultValue="true"/>
+
+        <ListPreference android:key="translate_to"
+            android:title="Translate to"
+            android:summary="Choose destination language"
+            android:dependency="preference_translate"
+            android:entries="@array/languagenames"
+            android:entryValues="@array/iso6393"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

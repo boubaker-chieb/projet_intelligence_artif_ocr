@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
     //booleans
     private boolean hidden = true;
     private boolean isFirstLunch;
-
-
     private boolean isEngineReady;
+    private boolean isTranslationActive;
+    private boolean isRecongnitionActive;
     //Strings
 
 
@@ -76,10 +76,11 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private LinearLayout menu;
     private View.OnClickListener cl;
+    private  TextView transaltedText;
     //les autres objets
 
     private TessBaseAPI baseApi;
-    private String sourceLanguageCodeTranslation;
+    //private String sourceLanguageCodeTranslation;
     private String targetLanguageCodeTranslation;
     private String targetLanguageName;
 
@@ -89,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         
-        if(isFirstLunch){
+        /*if(isFirstLunch){
             setDefaultPreferences();
-        }
+        }*/
         
         setContentView(R.layout.activity_capture);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -100,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
         baseApi = new TessBaseAPI();
         capture = (ImageButton) findViewById(R.id.button_capture);
         image = (ImageView) findViewById(R.id.result);
-
+        transaltedText = (TextView) findViewById(R.id.translated_text);
         menu = (LinearLayout) findViewById(R.id.reveal_items);
         settings = (ImageButton) findViewById(R.id.settings);
         help = (ImageButton) findViewById(R.id.Help);
-        this.resultOCR = (TextView)findViewById(R.id.detection_result);
+        resultOCR = (TextView)findViewById(R.id.detection_result);
 
         capture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         help.setOnClickListener(cl);
         setSupportActionBar(toolbar);
         menu.setVisibility(View.INVISIBLE);
+        getPreferences();
     }
 
     @Override
@@ -155,80 +157,55 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case -1:
+
+
                 bitmap = (Bitmap) data.getExtras().get("data");
                 image.setImageBitmap(bitmap);
-
-                // TODO
-                /*
-                La dernière langage utilisé par l'aplication sera enregistré dans un shared settings
-                si le language courant est le que le language de la dernière utilisation de l'appppppp
-                on passse directement à la reconnaissance si nn on initialise l'ocr ...
-                 */
                 baseApi = new TessBaseAPI();
-                initOcrIngine(Environment.getExternalStorageDirectory(),lang,"eng");
+                String previousLangugeCodeOcr = sourceLanguageCode;
+                getPreferences();
+                if(isRecongnitionActive){
+                    boolean doInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr);
+                    if(!doInitAgain) {
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
+                    }else startOcr();
+                }else{
+                    Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
+                }
+                
                 break;
         }
 
-
-
-
-    }
-
-    public void startOcr(Bitmap bitmap, String lang){
-
-        createDir(); // créer le repertoire tessdata.
-
-        boolean isOcrReady = isOCRReady(lang);
-
-        //si l'ocr n'est pas prés à cause de manque de fichiers necéssaire, on fait le téléchargement de ces fichiers.....
-        if(!isOcrReady){
-
-        }
-
-    }
-    private boolean isOCRReady(String lang){
-
-        if(!(new File(DATA_PATH + "tessdata/" + lang + ".traineddata")).exists()){
-            Toast.makeText(MainActivity.this, "file not exist", Toast.LENGTH_SHORT).show();
-            return  false;
-        }
-        Toast.makeText(MainActivity.this, "File existe", Toast.LENGTH_SHORT).show();
-        return  true;
-    }
-    public  File createDir() {
-        File DIR=null;
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-            DIR=new File(Environment.getExternalStorageDirectory()+DIRNAME);
-        else
-            DIR=this.getApplicationContext().getCacheDir();
-        if(!DIR.exists())
-            DIR.mkdirs();
-        return DIR;
     }
 
     //// Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
     public void startOcr() {
         try {
-            OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,"eng",baseApi);
+            OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,sourceLanguageCode,baseApi);
             ocrOperation.runOCR();
             recongnizedText = ocrOperation.getRecognizedText();
             this.resultOCR.setText(recongnizedText);
             runTranslation();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "L'ocr ma mchech :(");
+            Log.e(TAG, "L'ocr ma mchech :(   :o !! !! !!");
             Toast.makeText(MainActivity.this, "Faild to do the recongnition !", Toast.LENGTH_SHORT).show();
         }
     }
     //lancer la translation
     private void runTranslation() {
-        new TranslationAsyncTask(this,recongnizedText, lang, "fr").execute();
+        getPreferences();
+        if(isTranslationActive){
+            new TranslationAsyncTask(this,recongnizedText, LanguageCodeHelper.mapLanguageCode(sourceLanguageCode),
+                    LanguageCodeHelper.mapLanguageCode(targetLanguageCodeTranslation)).execute();
+        }else Toast.makeText(MainActivity.this, "Pensez à activier la translation", Toast.LENGTH_LONG).show();
+
     }
 
     //initialiser ocr
 
     private void  initOcrIngine(File storageRoot, String languageCode, String languageName) {
-        deleteDirContent("tessdata"); // une solution temporaire pour évité lé exception
+        //deleteDirContent("tessdata"); // une solution temporaire pour évité lé exception TODO : évité cette solution
         isEngineReady = false;
         if(dialog != null){
             dialog.dismiss();
@@ -239,8 +216,6 @@ public class MainActivity extends AppCompatActivity {
             for (String s : CUBE_REQUIRED_LANGUAGES) {
                 if (s.equals(languageCode)) {
                     ocrEngineMode = TessBaseAPI.OEM_CUBE_ONLY;
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-                    //prefs.edit().putString(PreferencesActivity.KEY_OCR_ENGINE_MODE, getOcrEngineModeName()).commit();
                 }
             }
         }
@@ -276,6 +251,9 @@ public class MainActivity extends AppCompatActivity {
         new InitOCRAsyncTask(this, languageCode, baseApi, ocrEngineMode)
                 .execute(storageRoot.toString());
     }
+
+
+    //get ocr engne mode
     String getOcrEngineModeName() {
         String ocrEngineModeName = "";
         String[] ocrEngineModes = getResources().getStringArray(R.array.ocrenginemodes);
@@ -314,23 +292,23 @@ public class MainActivity extends AppCompatActivity {
     private void setDefaultPreferences(){
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putString(SettingsActivity.KEY_SOURCE_LANGUAGE_PREFERENCE,this.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
-        prefs.edit().putString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,this.DEFAULT_TARGET_LANGUAGE_CODE);
+        prefs.edit().putString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,this.DEFAULT_TARGET_LANGUAGE_CODE).commit();
     }
 
-    public boolean setSourceLanguageCode(String sourceLanguageCode) {
+   public boolean setSourceLanguageCode(String sourceLanguageCode) {
         this.sourceLanguageCode = sourceLanguageCode;
-        sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(sourceLanguageCode);
+        //sourceLanguageCodeTranslation = LanguageCodeHelper.mapLanguageCode(sourceLanguageCode);
         
-        sourceLanguageName = LanguageCodeHelper.getTranslationLanguageName(this,sourceLanguageCode);
+        //sourceLanguageName = LanguageCodeHelper.getTranslationLanguageName(this,sourceLanguageCode);
         
         return  true;
     }
-    private boolean setTargetLanguage(String languageCode) {
+    private boolean setTargetLanguageCode(String languageCode) {
         targetLanguageCodeTranslation = languageCode;
-        targetLanguageName = LanguageCodeHelper.getTranslationLanguageName(this, languageCode);
+       // targetLanguageName = LanguageCodeHelper.getTranslationLanguageName(this, languageCode);
         return true;
     }
-    // méthode utilisé pour vider le dossier tessdata aprés chaque essai de reconginition
+    // méthode utilisé pour supprimer le dossier tessdata
     private void deleteDirContent(String dirName){
         File dir = new File(DATA_PATH + File.separator + dirName);
         if(dir.isDirectory()){
@@ -339,5 +317,24 @@ public class MainActivity extends AppCompatActivity {
                 new File(dir, children[i]).delete();
             }
         }
+    }
+    //Récupérer les préférerences à partire de SttingsActivity et les enregitré dans des varible de cette activity
+  private void  getPreferences(){
+      prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      PreferenceManager.setDefaultValues(this,R.xml.settings,false);
+      setSourceLanguageCode(prefs.getString(SettingsActivity.KEY_SOURCE_LANGUAGE_PREFERENCE,MainActivity.DEFAULT_SOURCE_LANGUAGE_CODE));
+      setTargetLanguageCode(prefs.getString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,MainActivity.DEFAULT_TARGET_LANGUAGE_CODE));
+      isTranslationActive = prefs.getBoolean(SettingsActivity.KEY_ACTIVATE_TRANSLATION,false);
+      isRecongnitionActive = prefs.getBoolean(SettingsActivity.KEY_ACTIVATE_RECOGNITION,false);
+  }
+
+    public String getSourceLanguageCode() {
+        getPreferences();
+        return sourceLanguageCode;
+    }
+
+    public String getTargetLanguageCodeTranslation() {
+        getPreferences();
+        return targetLanguageCodeTranslation;
     }
 }
