@@ -15,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";/**  code ISO 639-1  de la language source*/
-    public static final String DEFAULT_TARGET_LANGUAGE_CODE = "fr";    /**  code ISO 639-1  de la language destinition*/
+    public static final String DEFAULT_TARGET_LANGUAGE_CODE = "fra";    /**  code ISO 639-1  de la language destinition*/
 
     private final static  String TAG = MainActivity.class.getSimpleName();
     public static final String OSD_FILENAME_BASE = "osd.traineddata";
@@ -165,8 +164,13 @@ public class MainActivity extends AppCompatActivity{
                 baseApi = new TessBaseAPI();
                 String previousLangugeCodeOcr = sourceLanguageCode;
                 getPreferences();
+                Log.d(TAG, sourceLanguageCode + "****************************************************");
                 if(isRecongnitionActive){
-                    boolean doInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr);
+                    if( sourceLanguageCode == null){
+                        setDefaultPreferences();
+                        getPreferences();
+                    }
+                    boolean doInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
                     if(!doInitAgain) {
                         initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
                     }else startOcr();
@@ -292,8 +296,12 @@ public class MainActivity extends AppCompatActivity{
     }
     private void setDefaultPreferences(){
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putString(SettingsActivity.KEY_SOURCE_LANGUAGE_PREFERENCE,this.DEFAULT_SOURCE_LANGUAGE_CODE).commit();
-        prefs.edit().putString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,this.DEFAULT_TARGET_LANGUAGE_CODE).commit();
+        //récupérer les préférences de l'application si'l ne trouve rien il retyourne null
+        // une valeur null est utilisé pour tester si c'est  la première fois l'application se lance ou bien
+        // s'il y'a perte des valeur enregistré.
+
+        prefs.edit().putString(SettingsActivity.KEY_SOURCE_LANGUAGE_PREFERENCE,null).commit();
+        prefs.edit().putString(SettingsActivity.KEY_TRGET_LANGUAGE_PREFERENCE,null).commit();
     }
 
    public boolean setSourceLanguageCode(String sourceLanguageCode) {
