@@ -83,11 +83,12 @@ public class InitOCRAsyncTask extends AsyncTask<String, String, Boolean> {
         progressBar.setVisibility(View.INVISIBLE);
         dialog.dismiss();
         if(result){
+            mainActivity.initOcrStarted=false;
           mainActivity.startOcr();
         }
         else
         {
-            Toast.makeText(mainActivity, "No internet acses plz enable network and restart this app ^^", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainActivity, "No internet acses plz enable network and restart this app ", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -14,7 +14,8 @@
             android:dependency="preference_recongnize"
             android:summary="Choose source language"
             android:entries="@array/languagenames"
-            android:entryValues="@array/iso6393"/>
+            android:entryValues="@array/iso6393"
+            android:defaultValue=""/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -30,7 +31,8 @@
             android:summary="Choose destination language"
             android:dependency="preference_translate"
             android:entries="@array/languagenames"
-            android:entryValues="@array/iso6393"/>
+            android:entryValues="@array/iso6393"
+            android:defaultValue=""/>
     </PreferenceCategory>
 
 </PreferenceScreen>

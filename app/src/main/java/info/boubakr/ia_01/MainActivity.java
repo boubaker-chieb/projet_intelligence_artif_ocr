@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity{
     private boolean isEngineReady;
     private boolean isTranslationActive;
     private boolean isRecongnitionActive;
+    public  boolean initOcrStarted = false;
     //Strings
 
 
@@ -166,12 +167,17 @@ public class MainActivity extends AppCompatActivity{
                 getPreferences();
                 Log.d(TAG, sourceLanguageCode + "****************************************************");
                 if(isRecongnitionActive){
-                    if( sourceLanguageCode == null){
+                    if(!isdataExist("tessdata")){
+                        setDefaultPreferences();
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
+                    }
+                    if("".equals( sourceLanguageCode)){
                         setDefaultPreferences();
                         getPreferences();
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
                     }
-                    boolean doInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
-                    if(!doInitAgain) {
+                    boolean dontInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
+                    if(!dontInitAgain) {
                         initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
                     }else startOcr();
                 }else{
@@ -185,16 +191,18 @@ public class MainActivity extends AppCompatActivity{
 
     //// Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
     public void startOcr() {
-        try {
-            OcrOperation ocrOperation = new OcrOperation(bitmap,DATA_PATH,sourceLanguageCode,baseApi);
-            ocrOperation.runOCR();
-            recongnizedText = ocrOperation.getRecognizedText();
-            this.resultOCR.setText(recongnizedText);
-            runTranslation();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, "L'ocr ma mchech :(   :o !! !! !!");
-            Toast.makeText(MainActivity.this, "Faild to do the recongnition !", Toast.LENGTH_SHORT).show();
+        if(!initOcrStarted) {
+            try {
+                OcrOperation ocrOperation = new OcrOperation(bitmap, DATA_PATH, sourceLanguageCode, baseApi);
+                ocrOperation.runOCR();
+                recongnizedText = ocrOperation.getRecognizedText();
+                this.resultOCR.setText(recongnizedText);
+                runTranslation();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "L'ocr ma mchech :(   :o !! !! !!");
+                Toast.makeText(MainActivity.this, "Faild to do the recongnition !", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     //lancer la translation
@@ -212,6 +220,7 @@ public class MainActivity extends AppCompatActivity{
     private void  initOcrIngine(File storageRoot, String languageCode, String languageName) {
         //deleteDirContent("tessdata"); // une solution temporaire pour évité lé exception TODO : évité cette solution
         isEngineReady = false;
+        initOcrStarted = true;
         if(dialog != null){
             dialog.dismiss();
         }
@@ -345,5 +354,13 @@ public class MainActivity extends AppCompatActivity{
     public String getTargetLanguageCodeTranslation() {
         getPreferences();
         return targetLanguageCodeTranslation;
+    }
+    private boolean isdataExist(String dir){
+        File tessdataDir = new File(DATA_PATH + File.separator + dir);
+        File traineddata = new File(DATA_PATH + File.separator + dir + File.separator + sourceLanguageCode+".traineddata");
+        if(tessdataDir.exists() &&  traineddata.exists())
+            return true;
+
+        return false;
     }
 }
