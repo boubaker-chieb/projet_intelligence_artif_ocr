@@ -15,22 +15,22 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public static final String KEY_ACTIVATE_TRANSLATION = "preference_translate";
     public static final String KEY_ACTIVATE_RECOGNITION= "preference_recongnize";
 
-    public static  SharedPreferences sharedPreferences;
+    /*public static  SharedPreferences sharedPreferences;
 
     public static ListPreference listPreferenceSourceLanguage;
     public static ListPreference listPreferenceTargetLanguage;
     public static CheckBoxPreference activateTranslation;
-    public static CheckBoxPreference activateRecongnition;
+    public static CheckBoxPreference activateRecongnition;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+       /* sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         listPreferenceSourceLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_SOURCE_LANGUAGE_PREFERENCE);
         listPreferenceTargetLanguage = (ListPreference) getPreferenceScreen().findPreference(KEY_TRGET_LANGUAGE_PREFERENCE);
         activateRecongnition = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_ACTIVATE_RECOGNITION);
-        activateTranslation = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_ACTIVATE_TRANSLATION);
+        activateTranslation = (CheckBoxPreference) getPreferenceScreen().findPreference(KEY_ACTIVATE_TRANSLATION);*/
     }
 
     @Override

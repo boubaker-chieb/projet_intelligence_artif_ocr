@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -12,10 +14,12 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,8 +29,13 @@ import android.widget.Toast;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import info.boubakr.ia_01.info.camera.CameraPreview;
 import info.boubakr.ia_01.info.ocr.InitOCRAsyncTask;
 import info.boubakr.ia_01.info.ocr.OcrOperation;
 import info.boubakr.ia_01.info.translation.LanguageCodeHelper;
@@ -35,6 +44,13 @@ import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 public class MainActivity extends AppCompatActivity{
 
+    //
+
+    private Camera camera;
+    private CameraPreview preview;
+    private FrameLayout frameLayout;
+    private boolean isCaptured = false;
+    //
     private SharedPreferences prefs;
     //ints
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
@@ -42,10 +58,9 @@ public class MainActivity extends AppCompatActivity{
     //Strings[]
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
-
+    private LinearLayout resultatLayout;
     //booleans
     private boolean hidden = true;
-    private boolean isFirstLunch;
     private boolean isEngineReady;
     private boolean isTranslationActive;
     private boolean isRecongnitionActive;
@@ -85,17 +100,20 @@ public class MainActivity extends AppCompatActivity{
     private String targetLanguageCodeTranslation;
     private String targetLanguageName;
 
-
+    private Camera.PictureCallback mPicture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        
-        /*if(isFirstLunch){
-            setDefaultPreferences();
-        }*/
+
         
         setContentView(R.layout.activity_capture);
+        //
+        camera = Camera.open();
+        preview = new CameraPreview(this,camera);
+        frameLayout = (FrameLayout) findViewById(R.id.camera_preview);
+        frameLayout.addView(preview);
+        //
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         lang = "eng";
         appContext = getApplicationContext();
@@ -107,15 +125,62 @@ public class MainActivity extends AppCompatActivity{
         settings = (ImageButton) findViewById(R.id.settings);
         help = (ImageButton) findViewById(R.id.Help);
         resultOCR = (TextView)findViewById(R.id.detection_result);
+        resultatLayout = (LinearLayout) findViewById(R.id.result_layout);
+        mPicture =  new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
 
+                bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
+                if(bitmap == null){
+                    Toast.makeText(MainActivity.this, "empty captured image", Toast.LENGTH_SHORT).show();
+                }
+                image.setImageBitmap(bitmap);
+                baseApi = new TessBaseAPI();
+                String previousLangugeCodeOcr = sourceLanguageCode;
+                getPreferences();
+                Log.d(TAG, sourceLanguageCode + "****************************************************");
+                if(isRecongnitionActive){
+                    if(!isdataExist("tessdata")){
+                        setDefaultPreferences();
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
+                    }
+                    if("".equals( sourceLanguageCode)){
+                        setDefaultPreferences();
+                        getPreferences();
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
+                    }
+                    boolean dontInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
+                    if(!dontInitAgain) {
+                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
+                    }else startOcr();
+                }else{
+                    Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
+                }
+
+
+            }
+        };
+        //boutton capture
         capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, 0);
+               /* Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 0);*/
+                if(!isCaptured){
+                    camera.takePicture(null,null,mPicture);
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.reload));
+                    resultatLayout.setVisibility(View.VISIBLE);
+                    isCaptured = true;
+                }
+                else {
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter));
+                    camera.startPreview();
+                    resultatLayout.setVisibility(View.INVISIBLE);
+                    isCaptured = false;
+                }
             }
         });
+        //boutton settngs
         cl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,47 +212,6 @@ public class MainActivity extends AppCompatActivity{
         getPreferences();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch( resultCode )
-        {
-            case 0:
-                Log.i("Alert", "Cant access to camera");
-                break;
-
-            case -1:
-
-
-                bitmap = (Bitmap) data.getExtras().get("data");
-                image.setImageBitmap(bitmap);
-                baseApi = new TessBaseAPI();
-                String previousLangugeCodeOcr = sourceLanguageCode;
-                getPreferences();
-                Log.d(TAG, sourceLanguageCode + "****************************************************");
-                if(isRecongnitionActive){
-                    if(!isdataExist("tessdata")){
-                        setDefaultPreferences();
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
-                    }
-                    if("".equals( sourceLanguageCode)){
-                        setDefaultPreferences();
-                        getPreferences();
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
-                    }
-                    boolean dontInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
-                    if(!dontInitAgain) {
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
-                    }else startOcr();
-                }else{
-                    Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
-                }
-                
-                break;
-        }
-
-    }
 
     //// Appel de la classe OcrOperation qui est responsable de faire le precessus de reconnaissance .. 5edma ndhifa :3
     public void startOcr() {
@@ -362,5 +386,10 @@ public class MainActivity extends AppCompatActivity{
             return true;
 
         return false;
+    }
+    ///*******
+    private Bitmap scaleDownBitmapImage(Bitmap bitmap, int newWidth, int newHeight){
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+        return resizedBitmap;
     }
 }

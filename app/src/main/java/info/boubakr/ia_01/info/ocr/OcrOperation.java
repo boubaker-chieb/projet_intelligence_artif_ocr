@@ -1,9 +1,14 @@
 package info.boubakr.ia_01.info.ocr;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.IOException;
+
+import info.boubakr.ia_01.MainActivity;
 
 /**
  * Created by aboubakr on 06/04/16.
@@ -27,6 +32,7 @@ public class OcrOperation {
     public void runOCR() throws IOException{
       baseAPI.setDebug(true);
         baseAPI.init(path, languageCode);
+        if(bitmap == null) Log.d("TAG", "bitmap null*********************************************************************");
         baseAPI.setImage(bitmap);
         recognizedText = baseAPI.getUTF8Text();
         baseAPI.end();
