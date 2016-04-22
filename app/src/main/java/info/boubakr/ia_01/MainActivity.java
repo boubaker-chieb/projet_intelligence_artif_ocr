@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity{
                     isCaptured = true;
                 }
                 else {
-                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter));
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter1));
                     camera.startPreview();
                     image.setImageBitmap(null);
                     resultatLayout.setVisibility(View.INVISIBLE);

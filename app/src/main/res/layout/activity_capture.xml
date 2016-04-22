@@ -16,7 +16,7 @@
         android:id="@+id/button_capture"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="@drawable/shutter"
+        android:background="@drawable/shutter1"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"/>
     <LinearLayout
@@ -97,6 +97,7 @@
                         android:id="@+id/Help"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
+                        android:background="@drawable/help"
                         />
 
                     <TextView
