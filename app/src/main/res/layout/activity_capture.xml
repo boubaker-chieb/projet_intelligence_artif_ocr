@@ -4,68 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="info.boubakr.ia_01.MainActivity">
-
-<!--<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/result"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_above="@+id/button_capture"
-            android:background="@color/textColorPrimary"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="21dp"/>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:textColor="@color/colorPrimary"
-                android:id="@+id/detection_result"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="detected text"
-                android:layout_marginRight="30dp"/>
-            <TextView
-                android:id="@+id/translated_text"
-                android:layout_width="wrap_content"
-                android:hint="translated text"
-                android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginTop="50dp"/>
-
-            <ProgressBar
-                android:id="@+id/telechargement"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
-
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
-        <ImageButton
-            android:id="@+id/button_capture"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/shutter"
-            android:layout_gravity="bottom|center"
-            android:layout_marginBottom="5dp"
-            android:elevation="8dp"/>-->
     <FrameLayout
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="55dp"
         android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -85,28 +25,35 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
+        <ImageView
+            android:id="@+id/result"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginRight="21dp"
+            android:layout_marginTop="54dp"/>
         <LinearLayout
             android:layout_marginTop="70dp"
             android:id="@+id/text_layout"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:gravity="center">
+            android:gravity="center"
+            >
 
             <TextView
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/detection_result"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="detected text"
-                android:layout_marginRight="30dp"/>
+                android:layout_marginLeft="10dp"/>
             <TextView
                 android:id="@+id/translated_text"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:hint="translated text"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"/>
+                android:textColor="@color/colorPrimary"
+                android:layout_marginLeft="10dp"/>
 
             <ProgressBar
                 android:id="@+id/telechargement"
@@ -116,12 +63,7 @@
                 android:visibility="gone"
                 />
         </LinearLayout>
-        <ImageView
-            android:id="@+id/result"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="21dp"/>
+
     </LinearLayout>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"

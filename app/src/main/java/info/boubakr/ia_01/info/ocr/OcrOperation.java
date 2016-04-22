@@ -20,17 +20,21 @@ public class OcrOperation {
     private String path; //Stockage du device
     private String languageCode; // code ISO du language !
     private  TessBaseAPI baseAPI; //La clase qui fait la reconnaissance.
-
+    private MainActivity mainActivity;
+    private byte[] data;
     // constructeur ;)
-    public OcrOperation(Bitmap bitmap , String path, String languageCode, TessBaseAPI baseAPI){
+    public OcrOperation(Bitmap bitmap , String path, String languageCode, TessBaseAPI baseAPI,MainActivity mainActivity,byte[] data){
         this.bitmap = bitmap ;
         this.path = path;
         this.languageCode = languageCode;
         this.baseAPI = baseAPI;
+        this.mainActivity=mainActivity;
+        this.data = data;
     }
 
     public void runOCR() throws IOException{
-      baseAPI.setDebug(true);
+        handleBitmap(bitmap);
+        baseAPI.setDebug(true);
         baseAPI.init(path, languageCode);
         if(bitmap == null) Log.d("TAG", "bitmap null*********************************************************************");
         baseAPI.setImage(bitmap);
@@ -40,5 +44,26 @@ public class OcrOperation {
 
     public String getRecognizedText() {
         return recognizedText;
+    }
+
+    public void handleBitmap(Bitmap image) {
+        int w = image.getWidth(), h = image.getHeight();
+        int[] rgb = new int[w * h];
+        byte[] yuv = new byte[w * h];
+
+        image.getPixels(rgb, 0, w, 0, 0, w, h);
+        populateYUVLuminanceFromRGB(rgb, yuv, w, h);
+    }
+
+    // Inspired in large part by:
+// http://ketai.googlecode.com/svn/trunk/ketai/src/edu/uic/ketai/inputService/KetaiCamera.java
+    private void populateYUVLuminanceFromRGB(int[] rgb, byte[] yuv420sp, int width, int height) {
+        for (int i = 0; i < width * height; i++) {
+            float red = (rgb[i] >> 16) & 0xff;
+            float green = (rgb[i] >> 8) & 0xff;
+            float blue = (rgb[i]) & 0xff;
+            int luminance = (int) ((0.257f * red) + (0.504f * green) + (0.098f * blue) + 16);
+            yuv420sp[i] = (byte) (0xff & luminance);
+        }
     }
 }

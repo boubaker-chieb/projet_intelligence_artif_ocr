@@ -17,7 +17,6 @@ public class TranslationAsyncTask extends AsyncTask<String, String, Boolean> {
     private String textSource;
     private String translatedText="";
 
-    //les deux languages pour le moment on suppose que le languege est  le Fr et on on translate a Eng :o!
     private String sourceLanguageCode ;
     private String targetLanguageCode ;
     //

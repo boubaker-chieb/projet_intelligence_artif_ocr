@@ -6,15 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,12 +28,7 @@ import android.widget.Toast;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import info.boubakr.ia_01.info.camera.CameraPreview;
 import info.boubakr.ia_01.info.ocr.InitOCRAsyncTask;
 import info.boubakr.ia_01.info.ocr.OcrOperation;
@@ -50,11 +44,11 @@ public class MainActivity extends AppCompatActivity{
     private CameraPreview preview;
     private FrameLayout frameLayout;
     private boolean isCaptured = false;
+    private byte[] data;
     //
     private SharedPreferences prefs;
     //ints
     private int ocrEngineMode = TessBaseAPI.OEM_TESSERACT_ONLY;
-
     //Strings[]
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
@@ -129,8 +123,9 @@ public class MainActivity extends AppCompatActivity{
         mPicture =  new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-
+                MainActivity.this.data = data;
                 bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
+                bitmap =  rotateBitmap(bitmap,90);
                 if(bitmap == null){
                     Toast.makeText(MainActivity.this, "empty captured image", Toast.LENGTH_SHORT).show();
                 }
@@ -175,6 +170,7 @@ public class MainActivity extends AppCompatActivity{
                 else {
                     capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter));
                     camera.startPreview();
+                    image.setImageBitmap(null);
                     resultatLayout.setVisibility(View.INVISIBLE);
                     isCaptured = false;
                 }
@@ -189,11 +185,6 @@ public class MainActivity extends AppCompatActivity{
                         Snackbar.make(v, "General settings..", Snackbar.LENGTH_SHORT).show();
                         menu.setVisibility(View.INVISIBLE);
                         MainActivity.this.hidden = true;
-                        // TODO
-                        /*
-                        en cliquant sur ce boutton on lance une Activity contenant les paramtres
-
-                         */
                         Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
                         startActivity(intent);
                         break;
@@ -217,7 +208,7 @@ public class MainActivity extends AppCompatActivity{
     public void startOcr() {
         if(!initOcrStarted) {
             try {
-                OcrOperation ocrOperation = new OcrOperation(bitmap, DATA_PATH, sourceLanguageCode, baseApi);
+                OcrOperation ocrOperation = new OcrOperation(bitmap, DATA_PATH, sourceLanguageCode, baseApi,this,data);
                 ocrOperation.runOCR();
                 recongnizedText = ocrOperation.getRecognizedText();
                 this.resultOCR.setText(recongnizedText);
@@ -360,7 +351,7 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    //Récupérer les préférerences à partire de SttingsActivity et les enregitré dans des varible de cette activity
+    //Récupérer les préférerences à partir de SttingsActivity et les enregitré dans des varible de cette activity
   private void  getPreferences(){
       prefs = PreferenceManager.getDefaultSharedPreferences(this);
       PreferenceManager.setDefaultValues(this,R.xml.settings,false);
@@ -387,9 +378,36 @@ public class MainActivity extends AppCompatActivity{
 
         return false;
     }
-    ///*******
+    ///*******rsize bitmap.
     private Bitmap scaleDownBitmapImage(Bitmap bitmap, int newWidth, int newHeight){
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
         return resizedBitmap;
     }
+
+   //rotate bitmap .
+    public static Bitmap rotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+///////////////////////Cycle de  vie de l'activté capture
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //camera.stopPreview();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        camera.startPreview();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //TODO
+        camera.startPreview();
+    }
+    ///////////////////
 }
