@@ -391,23 +391,48 @@ public class MainActivity extends AppCompatActivity{
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
-///////////////////////Cycle de  vie de l'activté capture
+
+
+
+
+
+
+    ///////////////////////Cycle de  vie de l'activté capture
     @Override
     protected void onPause() {
-        super.onPause();
-        //camera.stopPreview();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        camera.startPreview();
+        super.onPause();//si l'activity passe en pause on doit libéré la Camera TODO
+        preview = null;
+        releaseCamera();
     }
     @Override
     protected void onResume() {
-        super.onResume();
-        //TODO
+        super.onResume();   //"en resume" la camera doit retourner en  marche  TODO
+        if(camera == null ){
+            camera = Camera.open();
+        }
+        if(preview == null ){
+            preview = new CameraPreview(this,camera);
+            frameLayout.removeAllViews();
+            frameLayout.addView(preview);
+        }
         camera.startPreview();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        preview = null;
+        releaseCamera();
+    }
+    /*@Override
+       protected void onRestart() {
+           super.onRestart();
+           camera.startPreview();
+       }*/
     ///////////////////
+    private void releaseCamera(){
+        if(camera != null ){
+            camera.release();
+            camera = null ;
+        }
+    }
 }
