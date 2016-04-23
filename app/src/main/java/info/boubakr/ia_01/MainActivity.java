@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity{
     //Strings[]
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
-    private LinearLayout resultatLayout;
+    private RelativeLayout resultatLayout;
     //booleans
     private boolean hidden = true;
     private boolean isEngineReady;
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity{
         settings = (ImageButton) findViewById(R.id.settings);
         help = (ImageButton) findViewById(R.id.Help);
         resultOCR = (TextView)findViewById(R.id.detection_result);
-        resultatLayout = (LinearLayout) findViewById(R.id.result_layout);
+        resultatLayout = (RelativeLayout) findViewById(R.id.result_layout);
         mPicture =  new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -392,17 +393,13 @@ public class MainActivity extends AppCompatActivity{
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-
-
-
-
-
-    ///////////////////////Cycle de  vie de l'activté capture
+   ///////////////////////Cycle de  vie de l'activté capture
     @Override
     protected void onPause() {
         super.onPause();//si l'activity passe en pause on doit libéré la Camera TODO
         preview = null;
         releaseCamera();
+        resultatLayout.setVisibility(View.INVISIBLE);
     }
     @Override
     protected void onResume() {
