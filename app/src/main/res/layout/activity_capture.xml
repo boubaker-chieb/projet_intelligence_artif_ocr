@@ -13,8 +13,6 @@
         android:layout_weight="1">
     </FrameLayout>
 
-
-
     <com.isseiaoki.simplecropview.CropImageView
         xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cropImageView"
@@ -36,38 +34,39 @@
         custom:scv_min_frame_size="50dp"
         custom:scv_frame_stroke_weight="1dp"
         custom:scv_guide_stroke_weight="1dp"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="crop ok"
-        android:id="@+id/cropok"
-        android:layout_alignParentBottom="true" />
     <ImageButton
         android:id="@+id/button_capture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@drawable/shutter1"
+        android:layout_width="75dp"
+        android:layout_height="70dp"
+        android:background="@drawable/shutter"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"/>
     <LinearLayout
         android:id="@+id/result_layout"
         android:visibility="gone"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="150dp"
-        android:layout_marginBottom="50dp">
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="80dp">
+        <ProgressBar
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/telechargement"/>
         <ImageView
             android:id="@+id/result"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="150dp"
+            android:layout_gravity="center"/>
         <LinearLayout
 
             android:id="@+id/text_layout"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center">
+>
             <TextView
                 android:textColor="@color/colorPrimary"
                 android:textSize="20dp"
@@ -79,9 +78,11 @@
                 android:textSize="15dp"
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/detection_result"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="detected text"
+                android:maxLines="4"
+                android:lines="4"
                 android:background="@color/colorAccent"/>
             <TextView
                 android:textColor="@color/colorPrimary"
@@ -93,19 +94,12 @@
                 android:textSize="15dp"
                 android:background="@color/colorAccent"
                 android:id="@+id/translated_text"
-                android:layout_width="wrap_content"
+                android:maxLines="4"
+                android:lines="4"
+                android:layout_width="match_parent"
                 android:hint="translated text"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginLeft="10dp"/>
-
-            <ProgressBar
-                android:id="@+id/telechargement"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                />
+                android:textColor="@color/colorPrimary"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -141,8 +135,7 @@
                         android:id="@+id/Help"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:background="@drawable/help"
-                        />
+                        android:background="@drawable/help"/>
 
                     <TextView
                         android:layout_width="wrap_content"

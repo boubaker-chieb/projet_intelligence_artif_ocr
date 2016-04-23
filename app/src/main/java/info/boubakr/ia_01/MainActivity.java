@@ -23,7 +23,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -114,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         lang = "eng";
         appContext = getApplicationContext();
-        baseApi = new TessBaseAPI();
         capture = (ImageButton) findViewById(R.id.button_capture);
         image = (ImageView) findViewById(R.id.result);
         transaltedText = (TextView) findViewById(R.id.translated_text);
@@ -128,76 +126,76 @@ public class MainActivity extends AppCompatActivity {
         crop.setCropMode(CropImageView.CropMode.FREE);
         crop.setHandleColor(getResources().getColor(R.color.colorPrimaryDark));
         crop.setGuideColor(getResources().getColor(R.color.colorPrimaryDark));
-        cropOK = (Button) findViewById(R.id.cropok);
-
-        cropOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bitmap = crop.getCroppedBitmap();
-                image.setImageBitmap(bitmap);
-                crop.setVisibility(View.INVISIBLE);
-                crop.setEnabled(false);
-                resultatLayout.setVisibility(View.VISIBLE);
-                //////////////////////lance la recongnition et la translation
-                if(bitmap == null){
-                    Toast.makeText(MainActivity.this, "empty captured image", Toast.LENGTH_SHORT).show();
-                }
-                //image.setImageBitmap(bitmap);
-                baseApi = new TessBaseAPI();
-                String previousLangugeCodeOcr = sourceLanguageCode;
-                getPreferences();
-                Log.d(TAG, sourceLanguageCode + "****************************************************");
-                if(isRecongnitionActive){
-                    if(!isdataExist("tessdata")){
-                        setDefaultPreferences();
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
-                    }
-                    if("".equals( sourceLanguageCode)){
-                        setDefaultPreferences();
-                        getPreferences();
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
-                    }
-                    boolean dontInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
-                    if(!dontInitAgain) {
-                        initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
-                    }else startOcr();
-                }else{
-                    Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
-                }
-                /////////////////////////////////
-
-            }
-        });
         mPicture =  new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
                 MainActivity.this.data = data;
-
                 bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
                 bitmap =  rotateBitmap(bitmap,90);
-
                 crop.setImageBitmap(bitmap);
-
-
             }
         };
         //boutton capture
         capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, 0);*/
+                // action capture
                 if(!isCaptured){
                     camera.takePicture(null,null,mPicture);
-                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.reload));
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.cropok));
                     isCaptured = true;
                 }
-                else {
-                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter1));
+                //lancer la reconnaissace
+                else if(isCaptured && !isCroped){
+                    baseApi = new TessBaseAPI();
+                    bitmap = crop.getCroppedBitmap();
+                    image.setImageBitmap(bitmap);
+                    crop.setVisibility(View.INVISIBLE);
+                    crop.setEnabled(false);
+                    crop.setImageBitmap(null);
+                    resultatLayout.setVisibility(View.VISIBLE);
+                    //////////////////////lance la recongnition et la translation
+                    if(bitmap == null){
+                        Toast.makeText(MainActivity.this, "empty captured image", Toast.LENGTH_SHORT).show();
+                    }
+                    //image.setImageBitmap(bitmap);
+                    baseApi = new TessBaseAPI();
+                    String previousLangugeCodeOcr = sourceLanguageCode;
+                    getPreferences();
+                    Log.d(TAG, sourceLanguageCode + "****************************************************");
+                    if(isRecongnitionActive){
+                        if(!isdataExist("tessdata")){
+                            setDefaultPreferences();
+                            initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
+                        }
+                        if("".equals( sourceLanguageCode)){
+                            setDefaultPreferences();
+                            getPreferences();
+                            initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName);
+                        }
+                        boolean dontInitAgain = sourceLanguageCode.equals(previousLangugeCodeOcr) ;
+                        if(!dontInitAgain) {
+                            initOcrIngine(Environment.getExternalStorageDirectory(), sourceLanguageCode, sourceLanguageName); //SourceLanguageName n'a pas d'influence sur l'opération, il est utilisé juste pour aire des affichage
+                        }else startOcr();
+                    }else{
+                        Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
+                    }
+                    /////////////////////////////////
+                    isCroped = true;
+                    isCroped = true;
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.reload));
+                }
+                else if(isCroped && isCaptured){
+                    //reload
+                    capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.shutter));
                     camera.startPreview();
                     image.setImageBitmap(null);
                     resultatLayout.setVisibility(View.INVISIBLE);
                     isCaptured = false;
+                    isCroped=false;
+                    crop.setVisibility(View.VISIBLE);
+                    crop.setEnabled(true);
+                    baseApi = null;
                 }
             }
         });
