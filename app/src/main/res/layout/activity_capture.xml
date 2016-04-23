@@ -3,39 +3,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     tools:context="info.boubakr.ia_01.MainActivity">
     <FrameLayout
         android:layout_marginTop="55dp"
         android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        />
+        android:layout_weight="1">
+    </FrameLayout>
 
+
+
+    <com.isseiaoki.simplecropview.CropImageView
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cropImageView"
+        android:layout_weight="1"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        custom:scv_crop_mode="fit_image"
+        custom:scv_handle_color="@color/colorAccent"
+        custom:scv_guide_color="@color/colorAccent"
+        custom:scv_frame_color="@color/colorAccent"
+        custom:scv_handle_size="14dp"
+        custom:scv_touch_padding="8dp"
+        custom:scv_handle_show_mode="show_always"
+        custom:scv_guide_show_mode="show_always"
+        custom:scv_min_frame_size="50dp"
+        custom:scv_frame_stroke_weight="1dp"
+        custom:scv_guide_stroke_weight="1dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="crop ok"
+        android:id="@+id/cropok"
+        android:layout_alignParentBottom="true" />
     <ImageButton
         android:id="@+id/button_capture"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@drawable/shutter1"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"/>
-    <RelativeLayout
+        android:layout_centerHorizontal="true" />
+    <LinearLayout
         android:id="@+id/result_layout"
         android:visibility="gone"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="50dp">
         <ImageView
             android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="54dp"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
         <LinearLayout
-            android:layout_marginTop="170dp"
+
             android:id="@+id/text_layout"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="match_parent"
             android:gravity="center">
             <TextView
                 android:textColor="@color/colorPrimary"
@@ -44,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="Source text:"/>
             <TextView
+
                 android:textSize="15dp"
                 android:textColor="@color/colorPrimary"
                 android:id="@+id/detection_result"
@@ -76,7 +108,7 @@
                 />
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

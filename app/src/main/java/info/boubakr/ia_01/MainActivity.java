@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,8 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.isseiaoki.simplecropview.CropImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +38,9 @@ import info.boubakr.ia_01.info.translation.LanguageCodeHelper;
 import info.boubakr.ia_01.info.translation.TranslationAsyncTask;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
-    //
-
+    private CropImageView crop;
     private Camera camera;
     private CameraPreview preview;
     private FrameLayout frameLayout;
@@ -53,13 +53,14 @@ public class MainActivity extends AppCompatActivity{
     //Strings[]
     static final String[] CUBE_SUPPORTED_LANGUAGES = {"eng","fr","ara"};
     private static final String[] CUBE_REQUIRED_LANGUAGES = {"ara"};
-    private RelativeLayout resultatLayout;
+    private LinearLayout resultatLayout;
     //booleans
     private boolean hidden = true;
     private boolean isEngineReady;
     private boolean isTranslationActive;
     private boolean isRecongnitionActive;
     public  boolean initOcrStarted = false;
+    private boolean isCroped = false;
     //Strings
 
 
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity{
     private String sourceLanguageCode;
     private String sourceLanguageName;
     //widjets
+    private Button cropOK;
     private ImageButton capture;
     private ImageView image;
     private  Bitmap bitmap;
@@ -120,17 +122,27 @@ public class MainActivity extends AppCompatActivity{
         settings = (ImageButton) findViewById(R.id.settings);
         help = (ImageButton) findViewById(R.id.Help);
         resultOCR = (TextView)findViewById(R.id.detection_result);
-        resultatLayout = (RelativeLayout) findViewById(R.id.result_layout);
-        mPicture =  new Camera.PictureCallback() {
+        resultatLayout = (LinearLayout) findViewById(R.id.result_layout);
+
+        crop = (CropImageView) findViewById(R.id.cropImageView);
+        crop.setCropMode(CropImageView.CropMode.FREE);
+        crop.setHandleColor(getResources().getColor(R.color.colorPrimaryDark));
+        crop.setGuideColor(getResources().getColor(R.color.colorPrimaryDark));
+        cropOK = (Button) findViewById(R.id.cropok);
+
+        cropOK.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                MainActivity.this.data = data;
-                bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
-                bitmap =  rotateBitmap(bitmap,90);
+            public void onClick(View v) {
+                bitmap = crop.getCroppedBitmap();
+                image.setImageBitmap(bitmap);
+                crop.setVisibility(View.INVISIBLE);
+                crop.setEnabled(false);
+                resultatLayout.setVisibility(View.VISIBLE);
+                //////////////////////lance la recongnition et la translation
                 if(bitmap == null){
                     Toast.makeText(MainActivity.this, "empty captured image", Toast.LENGTH_SHORT).show();
                 }
-                image.setImageBitmap(bitmap);
+                //image.setImageBitmap(bitmap);
                 baseApi = new TessBaseAPI();
                 String previousLangugeCodeOcr = sourceLanguageCode;
                 getPreferences();
@@ -152,6 +164,19 @@ public class MainActivity extends AppCompatActivity{
                 }else{
                     Toast.makeText(MainActivity.this, "Activer la récognition pour detecter le texte", Toast.LENGTH_LONG).show();
                 }
+                /////////////////////////////////
+
+            }
+        });
+        mPicture =  new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+                MainActivity.this.data = data;
+
+                bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
+                bitmap =  rotateBitmap(bitmap,90);
+
+                crop.setImageBitmap(bitmap);
 
 
             }
@@ -165,7 +190,6 @@ public class MainActivity extends AppCompatActivity{
                 if(!isCaptured){
                     camera.takePicture(null,null,mPicture);
                     capture.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.reload));
-                    resultatLayout.setVisibility(View.VISIBLE);
                     isCaptured = true;
                 }
                 else {
@@ -432,4 +456,6 @@ public class MainActivity extends AppCompatActivity{
             camera = null ;
         }
     }
+
+
 }

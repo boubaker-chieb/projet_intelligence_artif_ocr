@@ -30,4 +30,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.rmtheis:tess-two:5.4.0'
     compile 'com.android.support:design:23.2.0'
+
+    compile 'com.isseiaoki:simplecropview:1.1.0'
+
 }
