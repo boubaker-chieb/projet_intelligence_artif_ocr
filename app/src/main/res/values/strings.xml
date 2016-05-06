@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Android OCR</string>
-    <string name="title_activity_preferences">PreferencesActivity</string>
+    <string name="app_name">Your Photos Reader</string>
+    <string name="title_activity_preferences">Settings</string>
 </resources>

@@ -36,7 +36,7 @@ public class OcrOperation {
         handleBitmap(bitmap);
         baseAPI.setDebug(true);
         baseAPI.init(path, languageCode);
-        if(bitmap == null) Log.d("TAG", "bitmap null*********************************************************************");
+        if(bitmap == null) ;
         baseAPI.setImage(bitmap);
         recognizedText = baseAPI.getUTF8Text();
         baseAPI.end();
